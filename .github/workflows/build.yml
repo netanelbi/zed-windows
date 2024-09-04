@@ -2,7 +2,11 @@ name: Build Zed for Windows
 
 on:
   workflow_dispatch:
-
+    inputs:
+      tags:
+        description: 'Release tags'     
+        required: true
+        default: 'x.y.z'
 
 jobs:
   Build:
@@ -27,7 +31,7 @@ jobs:
       run: |
         git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
         git config --global user.name github-actions[bot]
-        git clone https://github.com/zed-industries/zed -b main zed
+        git clone --branch ${{ github.event.inputs.tags }} --depth 1 https://github.com/zed-industries/zed zed
 
     - name: Build Executable
       run: |
@@ -65,17 +69,11 @@ jobs:
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
           git config --global user.name github-actions[bot]
 
-      - name: Generate Release Tag
-        id: tag
-        run: |
-          echo "::set-output name=release_tag::$(date +"%Y.%m.%d")"
-          echo "::set-output name=release_date::$(date +"%Y.%m.%d")"     
-          
       - name: Upload to Releases
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ steps.tag.outputs.release_date }} Zed Windows
-          tag_name: ${{ steps.tag.outputs.release_tag }}
+          name: ${{ github.event.inputs.tags }} Zed Windows
+          tag_name: ${{ github.event.inputs.tags }}
           files: Output/zed_setup.exe
