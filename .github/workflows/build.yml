@@ -6,7 +6,7 @@ on:
       tags:
         description: 'Release tags'
         required: true
-        default: 'x.y.z'
+        default: 'nightly'
 
 jobs:
   Build:
